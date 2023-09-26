@@ -1,6 +1,8 @@
-# statskit
+# StatsKit
 
 ![My Project Logo](images/logo.png)
+
+A Python package containing useful statistical methods.
 
 ## Installation
 
