@@ -1,9 +1,49 @@
-from typing import Tuple
 import numpy as np
 from scipy import stats
 
 
-def sigma_percentiles(array: np.ndarray) -> Tuple[float, float]:
+def fit_powerlaw(x: np.array) -> tuple[float, float]:
+    """
+    Fit a power law distribution to the input data.
+
+    This function fits a power law distribution to the given data using the
+    `scipy.stats.powerlaw` module. It returns the estimated parameters of the
+    power law distribution.
+
+    Args:
+        x (np.array): The input data.
+
+    Returns:
+        tuple[float, float]: A tuple containing the estimated parameters of the
+        power law distribution. The first element is the alpha parameter, and the
+        second element is the x_min parameter.
+    """
+    fit = stats.powerlaw.fit(quantities, floc=0)
+    alpha, x_min = fit[0], fit[2]
+    return alpha, x_min
+
+
+def random_powerlaw(alpha: float, x_min: float, n_x: int = 100) -> np.array:
+    """
+    Generate random realizations from a power law distribution.
+
+    This function generates random realizations from a power law distribution
+    defined by the given parameters using the `scipy.stats.powerlaw` module.
+
+    Args:
+        alpha (float): The alpha parameter of the power law distribution.
+        x_min (float): The x_min parameter of the power law distribution.
+        n_x (int, optional): The number of random realizations to generate. Defaults to 100.
+
+    Returns:
+        np.array: An array containing the generated random realizations from the
+        power law distribution.
+    """
+    random_samples = stats.powerlaw.rvs(alpha, loc=0, scale=x_min, size=n_x)
+    return random_samples
+
+
+def sigma_percentiles(array: np.ndarray) -> tuple[float, float]:
     """
     Calculate the sigma values using percentiles.
 
@@ -14,7 +54,7 @@ def sigma_percentiles(array: np.ndarray) -> Tuple[float, float]:
         array (np.ndarray): The input array.
 
     Returns:
-        Tuple[float, float]: A tuple containing the upper and lower sigma values.
+        tuple[float, float]: A tuple containing the upper and lower sigma values.
     """
     array_median = np.median(array)
     sigma_upper = np.percentile(array, 84.135) - array_median
@@ -38,7 +78,7 @@ def sigma_mad(array: np.ndarray) -> float:
     return 1.4826 * np.median(np.abs(array - np.median(array)))
 
 
-def sigma_gehrels(n: int) -> Tuple[float, float]:
+def sigma_gehrels(n: int) -> tuple[float, float]:
     """
     Calculate the sigma values using Gehrels' approximation.
 
@@ -49,7 +89,7 @@ def sigma_gehrels(n: int) -> Tuple[float, float]:
         n (int): The count value.
 
     Returns:
-        Tuple[float, float]: A tuple containing the upper and lower sigma values.
+        tuple[float, float]: A tuple containing the upper and lower sigma values.
     """
     integers_to_limits = {
         0: (1.841, 2e-16),
@@ -168,8 +208,8 @@ def random_gaussian(
     mu: np.ndarray,
     sigma: np.ndarray,
     number_mc: int = 500,
-    bounds: Optional[Tuple[np.ndarray, np.ndarray]] = None,
-) -> Tuple[np.ndarray, np.ndarray]:
+    bounds: Optional[tuple[np.ndarray, np.ndarray]] = None,
+) -> tuple[np.ndarray, np.ndarray]:
     """
     Generate random samples from a multivariate normal distribution.
 
@@ -182,10 +222,10 @@ def random_gaussian(
         mu (np.ndarray): The mean vector.
         sigma (np.ndarray): The covariance matrix.
         number_mc (int, optional): The number of samples. Defaults to 500.
-        bounds (Optional[Tuple[np.ndarray, np.ndarray]], optional): The lower and upper bounds. Defaults to None.
+        bounds (Optional[tuple[np.ndarray, np.ndarray]], optional): The lower and upper bounds. Defaults to None.
 
     Returns:
-        Tuple[np.ndarray, np.ndarray]: A tuple containing the generated samples.
+        tuple[np.ndarray, np.ndarray]: A tuple containing the generated samples.
     """
     if bounds is None:
         return np.random.multivariate_normal(mu, sigma, size=number_mc).T
@@ -223,7 +263,7 @@ def histogram(
     bin_max: Optional[float] = None,
     bin_size: Optional[float] = None,
     **kwargs
-) -> Tuple[np.ndarray, np.ndarray]:
+) -> tuple[np.ndarray, np.ndarray]:
     """
     Calculate the histogram of an array.
 
@@ -238,7 +278,7 @@ def histogram(
         **kwargs: Additional keyword arguments to be passed to np.histogram.
 
     Returns:
-        Tuple[np.ndarray, np.ndarray]: A tuple containing the bin centers and frequencies of the histogram.
+        tuple[np.ndarray, np.ndarray]: A tuple containing the bin centers and frequencies of the histogram.
     """
     bin_min = np.floor(array.min()) if bin_min is None else bin_min
     bin_max = np.ceil(array.max()) if bin_max is None else bin_max
@@ -391,7 +431,9 @@ def bresenham_normalize(array: np.ndarray, to_value: int = 100) -> np.ndarray:
 
 
 def bootstrap(
-    array_observed: np.ndarray, number_of_bootstraps: int = 1499
+    array_observed: np.ndarray,
+    number_of_bootstraps: int = 1499,
+    bootstrap_method=np.sum,
 ) -> np.ndarray:
     """
     Perform bootstrap resampling on an observed array.
@@ -414,7 +456,7 @@ def bootstrap(
             number_of_elements, size=number_of_elements, replace=True
         )
         bootstrap_sample = array_observed[bootstrap_indices]
-        bootstrap_estimate = np.sum(bootstrap_sample)
+        bootstrap_estimate = bootstrap_method(bootstrap_sample)
         bootstrap_estimates[i] = bootstrap_estimate
     return bootstrap_estimates
 
