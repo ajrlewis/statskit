@@ -1,5 +1,6 @@
 import numpy as np
 from scipy import stats
+from typing import Optional
 
 
 def fit_powerlaw(x: np.array) -> tuple[float, float]:
@@ -18,7 +19,7 @@ def fit_powerlaw(x: np.array) -> tuple[float, float]:
         power law distribution. The first element is the alpha parameter, and the
         second element is the x_min parameter.
     """
-    fit = stats.powerlaw.fit(quantities, floc=0)
+    fit = stats.powerlaw.fit(x, floc=0)
     alpha, x_min = fit[0], fit[2]
     return alpha, x_min
 
