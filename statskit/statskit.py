@@ -1,5 +1,6 @@
 import numpy as np
 from scipy import stats
+from scipy.ndimage import gaussian_filter1d
 from typing import Optional
 
 
@@ -256,6 +257,25 @@ def random_split_normal(mu: float, sigma_upper: float, sigma_lower: float) -> fl
     """
     gauss = np.random.normal(0.0, 1.0)
     return mu + gauss * (sigma_upper if gauss > 0.0 else sigma_lower)
+
+
+def gaussian_smooth(array: np.array, sigma: float, mode: str = "wrap") -> np.array:
+    """
+    Apply Gaussian smoothing to the input data.
+
+    This function applies Gaussian smoothing to the given 1D input data using
+    the `scipy.ndimage.gaussian_filter1d` function.
+
+    Args:
+        array (np.array): The input data to be smoothed.
+        sigma (float): The standard deviation of the Gaussian kernel.
+        mode (str): Method to handle edge values.
+
+    Returns:
+        np.array: The Gaussian smoothed version of the input data.
+    """
+    smoothed_data = gaussian_filter1d(array, sigma, mode=mode)
+    return smoothed_data
 
 
 def histogram(
