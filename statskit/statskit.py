@@ -278,6 +278,32 @@ def gaussian_smooth(array: np.array, sigma: float, mode: str = "wrap") -> np.arr
     return smoothed_data
 
 
+def gaussian_fwhm_to_sigma(fwhm: float) -> float:
+    """
+    Converts a Gaussian FWHM to a standard deviation.
+
+    Args:
+        fwhm (float): The FWHM of the Gaussian.
+
+    Returns:
+        fwhm: The Gaussian standard deviation corresponding to the FWHM.
+    """
+    return fwhm / 2.355
+
+
+def gaussian_sigma_to_fwhm(sigma: float) -> float:
+    """
+    Converts a Gaussian standard deviation to a FWHM.
+
+    Args:
+        sigma (float): The standard deviation of the Gaussian.
+
+    Returns:
+        float: The Gaussian FHHM corresponding to the standard deviation.
+    """
+    return sigma * 2.355
+
+
 def histogram(
     array: np.ndarray,
     bin_min: Optional[float] = None,
